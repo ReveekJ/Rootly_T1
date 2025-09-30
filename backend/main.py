@@ -3,7 +3,10 @@ from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 from starlette.middleware.gzip import GZipMiddleware
 
-app = FastAPI()
+from backend.api.basic_logs.router import router as basic_logs_router
+app = FastAPI(
+
+)
 
 app.add_middleware(GZipMiddleware)
 app.add_middleware(
@@ -12,6 +15,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(basic_logs_router)
+
 
 @app.get("/")
 async def root():
