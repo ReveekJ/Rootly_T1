@@ -1,0 +1,3 @@
+[submodule "rootly-frontend"]
+	path = rootly-frontend
+	url = https://github.com/Tetrabiter/rootly-frontend.git
