@@ -1,10 +1,11 @@
+import uuid
 from typing import List
 
 from pydantic import BaseModel
 
 
 class HistoryRow(BaseModel):
-    id: str
+    id: uuid.UUID
     name: str
 
 class HistoryResponse(BaseModel):

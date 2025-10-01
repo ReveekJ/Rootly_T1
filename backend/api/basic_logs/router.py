@@ -29,7 +29,7 @@ async def upload(request: Request, file: UploadFile = File(...)):
 async def get_history(request: Request):
     async with await get_async_session() as session:
         query = select(LogModel.id, LogModel.name).where(LogModel.user_id == get_user_id(request))
-        res = (await session.execute(query)).scalars().all()
+        res = (await session.execute(query)).all()
 
     return HistoryResponse(result=[HistoryRow.model_validate(i, from_attributes=True) for i in res])
 
