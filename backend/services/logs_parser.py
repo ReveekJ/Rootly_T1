@@ -113,7 +113,7 @@ class LogsParser:
             level = self.extract_log_level(line)
             section = self.determine_section(line)
 
-            entry = {'timestamp': ts.isoformat(), 'level': level, 'raw': line, 'section': section}
+            entry = {'timestamp': ts.isoformat(), 'level': level, 'raw': line, 'section': section, 'bad_json': True}
             return entry, ts
 
     def parse_log_lines(self, lines: list[str]) -> list:
