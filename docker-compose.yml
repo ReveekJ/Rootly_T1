@@ -48,6 +48,19 @@ services:
 #      timeout: 5s
 #      retries: 5
 
+  rabbitmq:
+    image: rabbitmq:3.11-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"   # AMQP
+      - "15672:15672" # Management UI
+    env_file:
+      - .env
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    networks:
+      - app-network
+
 volumes:
   le_data:
   postgres-data:

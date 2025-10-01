@@ -3,3 +3,4 @@ uvicorn
 python-dotenv
 elasticsearch
 python-multipart
+aio-pika
