@@ -7,7 +7,6 @@ from backend.utils.ws_manager import manager
 async def on_message_parser(message: AbstractIncomingMessage):
     user_id = message.headers.get("user_id")
     result = LogsParser().parse_log_lines(message.body.decode().splitlines())
-    print(user_id)
 
     await manager.send_message(
         user_id,

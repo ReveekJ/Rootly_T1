@@ -17,6 +17,7 @@ RABBITMQ_PORT = int(os.getenv("RABBITMQ_PORT"))
 RABBITMQ_VHOST = os.getenv("RABBITMQ_VHOST")
 
 APP_URL = os.getenv("APP_URL")
+FRONT_URL = os.getenv("FRONT_URL")
 
 ES_HOST = os.getenv("ES_HOST")
 ES_PORT = os.getenv("ES_PORT")

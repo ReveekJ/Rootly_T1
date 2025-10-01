@@ -1,5 +1,5 @@
-import re
 import json
+import re
 from datetime import datetime, timedelta, timezone
 
 
@@ -91,8 +91,9 @@ class LogsParser:
             tf_req_id = obj.get('tf_req_id')
             req_body = self.parse_json_safe(obj.get('tf_http_req_body'))
             res_body = self.parse_json_safe(obj.get('tf_http_res_body'))
+
             entry = {
-                'timestamp': ts,
+                'timestamp': ts.isoformat(),
                 'level': level,
                 'section': section,
                 'tf_req_id': tf_req_id,
@@ -111,7 +112,8 @@ class LogsParser:
                     ts = datetime.now(timezone.utc)
             level = self.extract_log_level(line)
             section = self.determine_section(line)
-            entry = {'timestamp': ts, 'level': level, 'raw': line, 'section': section}
+
+            entry = {'timestamp': ts.isoformat(), 'level': level, 'raw': line, 'section': section}
             return entry, ts
 
     def parse_log_lines(self, lines: list[str]) -> list:

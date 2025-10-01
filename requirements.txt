@@ -4,3 +4,7 @@ python-dotenv
 elasticsearch[async]
 python-multipart
 aio-pika
+alembic
+psycopg2-binary
+SQLAlchemy
+asyncpg
