@@ -9,6 +9,9 @@ services:
       - "8080:8080"
     networks:
       - app_network
+    depends_on:
+      - rabbitmq
+      - db
 
   db:
     image: postgres:15

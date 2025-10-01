@@ -7,9 +7,6 @@ class LogsParser:
     ISO_TIMESTAMP = re.compile(r'\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z?')
     LOG_LEVELS = re.compile(r'\b(ERROR|WARN|WARNING|INFO|DEBUG|TRACE)\b', re.IGNORECASE)
 
-    def __init__(self, line: str):
-        self.__text = line
-
     def extract_timestamp(self, text):
         match = self.ISO_TIMESTAMP.search(text)
         if match:
@@ -65,15 +62,14 @@ class LogsParser:
         if previous_ts is not None and previous_ts.tzinfo is None:
             previous_ts = previous_ts.replace(tzinfo=timezone.utc)
 
+        ts = None
         try:
             obj = json.loads(line)
             # timestamp: check @timestamp then fallback to extraction or previous_ts + 1s
             ts_val = obj.get('@timestamp')
-            ts = None
             if ts_val:
                 if isinstance(ts_val, str):
                     ts = self.extract_timestamp(ts_val) or None
-                    # try direct fromisoformat if not matched by regex
                     if ts is None:
                         try:
                             t = datetime.fromisoformat(ts_val.replace('Z', '+00:00'))
@@ -81,7 +77,6 @@ class LogsParser:
                         except Exception:
                             ts = None
                 elif isinstance(ts_val, (int, float)):
-                    # assume epoch seconds
                     ts = datetime.fromtimestamp(ts_val, tz=timezone.utc)
             if ts is None:
                 ts = self.extract_timestamp(line)
@@ -96,7 +91,7 @@ class LogsParser:
             tf_req_id = obj.get('tf_req_id')
             req_body = self.parse_json_safe(obj.get('tf_http_req_body'))
             res_body = self.parse_json_safe(obj.get('tf_http_res_body'))
-            return {
+            entry = {
                 'timestamp': ts,
                 'level': level,
                 'section': section,
@@ -105,6 +100,7 @@ class LogsParser:
                 'response_body': res_body,
                 'raw': line,
             }
+            return entry, ts
         except json.JSONDecodeError:
             # fallback parse from text with regex heuristics
             ts = self.extract_timestamp(line)
@@ -115,4 +111,13 @@ class LogsParser:
                     ts = datetime.now(timezone.utc)
             level = self.extract_log_level(line)
             section = self.determine_section(line)
-            return {'timestamp': ts, 'level': level, 'raw': line, 'section': section}
+            entry = {'timestamp': ts, 'level': level, 'raw': line, 'section': section}
+            return entry, ts
+
+    def parse_log_lines(self, lines: list[str]) -> list:
+        parsed_entries = []
+        prev_ts = None
+        for line in lines:
+            entry, prev_ts = self.parse_log_entry(line, prev_ts)
+            parsed_entries.append(entry)
+        return parsed_entries

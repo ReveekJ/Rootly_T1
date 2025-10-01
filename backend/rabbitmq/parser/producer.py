@@ -1,9 +1,11 @@
+import json
+
 import aio_pika
 
 from backend.utils.rabbitmq_utils import get_rabbitmq_connection
 
 
-async def process_parsing(data: bytes):
+async def process_parsing(user_id: str, data: bytes):
     try:
         connection = await get_rabbitmq_connection()
 
@@ -17,6 +19,7 @@ async def process_parsing(data: bytes):
             message = aio_pika.Message(
                 body=data,
                 delivery_mode=aio_pika.DeliveryMode.PERSISTENT,
+                headers={"user_id": user_id}
             )
             await channel.default_exchange.publish(message, routing_key=routing_key)
 
