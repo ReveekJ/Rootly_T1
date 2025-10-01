@@ -1,9 +1,13 @@
+import asyncio
+
 import uvicorn
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 from starlette.middleware.gzip import GZipMiddleware
 
 from backend.api.basic_logs.router import router as basic_logs_router
+from backend.rabbitmq.start_consumers import start_consumers
+
 app = FastAPI(
 
 )
@@ -18,6 +22,10 @@ app.add_middleware(
 
 app.include_router(basic_logs_router)
 
+
+@app.on_event("startup")
+async def startup():
+    asyncio.create_task(start_consumers())
 
 @app.get("/")
 async def root():

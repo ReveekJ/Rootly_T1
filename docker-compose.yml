@@ -56,14 +56,19 @@ services:
       - "15672:15672" # Management UI
     env_file:
       - .env
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS}
+      RABBITMQ_DEFAULT_VHOST: ${RABBITMQ_VHOST}
     volumes:
       - rabbitmq-data:/var/lib/rabbitmq
     networks:
-      - app-network
+      - app_network
 
 volumes:
   le_data:
   postgres-data:
+  rabbitmq-data:
 
 networks:
   app_network:
