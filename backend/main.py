@@ -6,6 +6,7 @@ from starlette.middleware.cors import CORSMiddleware
 from starlette.middleware.gzip import GZipMiddleware
 
 from backend.api.basic_logs.router import router as basic_logs_router
+from backend.api.ws.router import router as ws_router
 from backend.rabbitmq.start_consumers import start_consumers
 
 app = FastAPI(
@@ -21,6 +22,7 @@ app.add_middleware(
 )
 
 app.include_router(basic_logs_router)
+app.include_router(ws_router)
 
 
 @app.on_event("startup")
