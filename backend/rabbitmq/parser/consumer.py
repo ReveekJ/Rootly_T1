@@ -19,12 +19,12 @@ async def on_message_parser(message: AbstractIncomingMessage):
         }
     )
 
-    async with get_async_session() as session:
+    async with await get_async_session() as session:
         m = LogModel(
             user_id=user_id,
             log_analistics=json.dumps(result)
         )
-        await session.add(m)
+        session.add(m)
         await session.commit()
 
     await message.ack()

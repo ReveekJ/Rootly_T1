@@ -1,11 +1,20 @@
+import json
 import uuid
 
 from fastapi import APIRouter, UploadFile, File, Request
+from sqlalchemy import select
 
+from backend.api.basic_logs.models import LogModel
+from backend.api.basic_logs.schemas import HistoryResponse, HistoryRow
+from backend.db.db_config import get_async_session
 from backend.rabbitmq.parser.producer import process_parsing
 
 router = APIRouter()
 
+
+@router.get("/set-user-id")
+async def set_user_id():
+    return str(uuid.uuid4())
 
 @router.post('/api/upload')
 async def upload(request: Request, file: UploadFile = File(...)):
@@ -13,9 +22,20 @@ async def upload(request: Request, file: UploadFile = File(...)):
     user_id = request.headers.get("user_id")
 
     await process_parsing(user_id, contents)
-    return contents # TODO: придумать что возвращать. Скорее всего ничего особо не надо, если будем работать через вебсокеты
+    return contents
 
+@router.get("/api/get_history", response_model=HistoryResponse)
+async def get_history(request: Request):
+    async with await get_async_session() as session:
+        query = select(LogModel.id, LogModel.name).where(LogModel.user_id == request.headers.get("user_id"))
+        res = (await session.execute(query)).scalars().all()
 
-@router.get("/set-user-id")
-async def set_user_id():
-    return str(uuid.uuid4())
+    return HistoryResponse(result=[HistoryRow.model_validate(i, from_attributes=True) for i in res])
+
+@router.get('/api/log_analistic/{id}')
+async def get_log_analistic(id: str):
+    async with await get_async_session() as session:
+        query = select(LogModel.log_analistics).where(LogModel.id == id)
+        res = (await session.execute(query)).scalars().first()
+
+    return json.dumps(res)
