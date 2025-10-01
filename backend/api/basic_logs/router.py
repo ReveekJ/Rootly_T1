@@ -8,6 +8,7 @@ from backend.api.basic_logs.models import LogModel
 from backend.api.basic_logs.schemas import HistoryResponse, HistoryRow
 from backend.db.db_config import get_async_session
 from backend.rabbitmq.parser.producer import process_parsing
+from backend.utils.fastapi_utils import get_user_id
 
 router = APIRouter()
 
@@ -19,7 +20,7 @@ async def set_user_id():
 @router.post('/api/upload')
 async def upload(request: Request, file: UploadFile = File(...)):
     contents = await file.read()
-    user_id = request.headers.get("user_id")
+    user_id = get_user_id(request)
 
     await process_parsing(user_id, contents)
     return contents
@@ -27,7 +28,7 @@ async def upload(request: Request, file: UploadFile = File(...)):
 @router.get("/api/get_history", response_model=HistoryResponse)
 async def get_history(request: Request):
     async with await get_async_session() as session:
-        query = select(LogModel.id, LogModel.name).where(LogModel.user_id == request.headers.get("user_id"))
+        query = select(LogModel.id, LogModel.name).where(LogModel.user_id == get_user_id(request))
         res = (await session.execute(query)).scalars().all()
 
     return HistoryResponse(result=[HistoryRow.model_validate(i, from_attributes=True) for i in res])
