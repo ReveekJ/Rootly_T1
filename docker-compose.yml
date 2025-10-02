@@ -76,6 +76,18 @@ services:
 #      - app_network
 #    env_file:
 #      - .env
+#  adminer:
+#    image: adminer:latest
+#    container_name: adminer
+#    restart: unless-stopped
+#    ports:
+#      - "8081:8080"   # Adminer web UI доступен по http://localhost:8081
+#    environment:
+#      ADMINER_DEFAULT_DB_DRIVER: pgsql
+#    networks:
+#      - app_network
+#    depends_on:
+#      - db
 
 volumes:
   esdata:
