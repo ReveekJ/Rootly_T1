@@ -35,7 +35,7 @@ async def get_history(request: Request):
     return HistoryResponse(result=[HistoryRow.model_validate(i, from_attributes=True) for i in res])
 
 @router.get('/api/log_analistic/{id}', response_model=Log)
-async def get_log_analistic(id: uuid.UUID, offset: int = 0, limit: int = 100):
+async def get_log_analistic(id: uuid.UUID):
     async with await get_async_session() as session:
         query = select(LogModel).options(selectinload(LogModel.lines)).where(LogModel.id == id)
         res = (await session.execute(query)).scalars().first()

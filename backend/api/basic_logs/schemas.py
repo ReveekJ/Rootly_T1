@@ -1,10 +1,8 @@
 import uuid
+from datetime import datetime
 from typing import List, Optional
 
 from pydantic import BaseModel
-from datetime import datetime
-
-from backend.api.basic_logs.enums import LogLevel, LogSection
 
 
 class HistoryRow(BaseModel):
