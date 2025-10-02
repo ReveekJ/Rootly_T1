@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+package terraformlogviewer;
+
+// Запрос — пачка строк логов
+message ParseLogsRequest {
+  string log_id = 1;
+}
+
+// Парсенная запись лога
+message LogEntry {
+  string timestamp = 1;          // ISO 8601 формат
+  string level = 2;              // ERROR, WARN, INFO, DEBUG, TRACE
+  string section = 3;            // plan, apply, прочее
+  string tf_req_id = 4;          // идентификатор цепочки
+  string tf_resource_type = 5;   // например, aws_instance
+  string raw = 6;                // оригинальная строка
+  string request_body_json = 7;  // JSON тело запроса (stringified, lazy)
+  string response_body_json = 8; // JSON тело ответа (stringified, lazy)
+}
+
+// Ответ — разобранные лог-записи и сводка
+message ParseLogsResponse {
+  repeated LogEntry entries = 1;
+}
+
+message UploadLogsRequest {
+  bytes log_file = 1;
+  string user_id = 2;
+}
+message UploadLogsResponse {
+  string log_id = 1;
+}
+
+service UploadService {
+  rpc UploadLogs (UploadLogsRequest) returns (UploadLogsResponse) {}
+}
+// Интерфейс сервиса парсинга
+service LogParserService {
+  // Парсинг пачки логов с возвратом структурированных записей
+  rpc ParseLogs (ParseLogsRequest) returns (ParseLogsResponse) {}
+}
