@@ -21,9 +21,10 @@ async def set_user_id():
 @router.post('/api/upload')
 async def upload(request: Request, file: UploadFile = File(...)):
     contents = await file.read()
+    filename = file.filename
     user_id = get_user_id(request)
 
-    await process_parsing(user_id, contents)
+    await process_parsing(user_id, filename, contents)
     return contents
 
 @router.get("/api/get_history", response_model=HistoryResponse)
