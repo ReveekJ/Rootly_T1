@@ -12,9 +12,10 @@ from backend.utils.ws_manager import manager
 async def on_message_parser(message: AbstractIncomingMessage):
     user_id = message.headers.get("user_id")
     name = message.headers.get("name")
+    log_id = uuid.UUID(message.headers.get("log_id"))
+
     result = LogsParser().parse_log_lines(message.body.decode().splitlines())
     async with await get_async_session() as session:
-        log_id = uuid.uuid4()
         m = LogModel(
             id=log_id,
             name=name,
