@@ -10,4 +10,5 @@ async def websocket_endpoint(user_id: str, websocket: WebSocket):
     await manager.connect(user_id, websocket)
 
     while True:
-        await websocket.receive_text()
+        a = await websocket.receive_text()
+        await websocket.send_text(a)

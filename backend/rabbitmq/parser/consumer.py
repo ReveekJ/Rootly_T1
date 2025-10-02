@@ -2,10 +2,8 @@ import json
 import uuid
 
 from aio_pika.abc import AbstractIncomingMessage
-from sqlalchemy import select
 
 from backend.api.basic_logs.models import LogModel, LogLineModel
-from backend.api.basic_logs.schemas import Log
 from backend.db.db_config import get_async_session
 from backend.services.logs_parser import LogsParser
 from backend.utils.ws_manager import manager
@@ -45,13 +43,11 @@ async def on_message_parser(message: AbstractIncomingMessage):
 
         await session.commit()
 
-        query = select(LogModel).where(LogModel.id == log_id)
-        res = (await session.execute(query)).scalars().first()
 
-    # await manager.send_message(
-    #     user_id,
-    #     {
-    #         'result': Log.model_validate(res, from_attributes=True).model_dump_json()
-    #     }
-    # )
+    await manager.send_message(
+        user_id,
+        {
+            'result': str(log_id)
+        }
+    )
     await message.ack()
